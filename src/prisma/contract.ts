@@ -1,35 +1,112 @@
-import { defineContract } from '@prisma/orm-postgres/contract-builder';
+import { defineContract, member } from "@prisma/orm-postgres/contract-builder";
 
 export const contract = defineContract({}, ({ field, model, rel }) => {
-  const User = model('User', {
+  const User = model(`User`, {
     fields: {
       id: field.id.uuidv7String(),
       email: field.text().unique(),
-      username: field.text().optional(),
       name: field.text().optional(),
+      username: field.text().optional(),
       createdAt: field.temporal.createdAtString(),
       updatedAt: field.temporal.updatedAtString(),
     },
   });
-
-  const Post = model('Post', {
+  const Workspace = model(`WorkSpace`, {
     fields: {
       id: field.id.uuidv7String(),
-      title: field.text(),
-      content: field.text().optional(),
-      authorId: field.uuidString(),
+      name: field.text(),
+      slug: field.text().unique(),
       createdAt: field.temporal.createdAtString(),
       updatedAt: field.temporal.updatedAtString(),
     },
   });
-
+  const WorkspaceMember = model(`WorkspaceMember`, {
+    fields: {
+      id: field.id.uuidv7String(),
+      userId: field.uuidString(),
+      workspaceId: field.uuidString(),
+      role: field.text(),
+      createdAt: field.temporal.createdAtString(),
+      updatedAt: field.temporal.updatedAtString(),
+    },
+  });
+  const Document = model(`Document`, {
+    fields: {
+      id: field.id.uuidv7String(),
+      workspaceId: field.uuidString(),
+      title: field.text(),
+      content: field.text().optional(),
+      createdAt: field.temporal.createdAtString(),
+      updatedAt: field.temporal.updatedAtString(),
+    },
+  });
+  const Conversation = model(`Conversation`, {
+    fields: {
+      id: field.id.uuidv7String(),
+      workspaceId: field.uuidString(),
+      title: field.text().optional(),
+      createdAt: field.temporal.createdAtString(),
+      updatedAt: field.temporal.updatedAtString(),
+    },
+  });
+  const Message = model(`Message`, {
+    fields: {
+      id: field.id.uuidv7String(),
+      content: field.text(),
+      role: field.text(),
+      conversationId: field.uuidString(),
+      createdAt: field.temporal.createdAtString(),
+      updatedAt: field.temporal.updatedAtString(),
+    },
+  });
   return {
     models: {
       User: User.relations({
-        posts: rel.hasMany(Post, { by: 'authorId' }),
+        workspaceMembers: rel.hasMany(WorkspaceMember, {
+          by: `userId`,
+        }),
       }),
-      Post: Post.relations({
-        author: rel.belongsTo(User, { from: 'authorId', to: 'id' }),
+      Workspace: Workspace.relations({
+        members: rel.hasMany(WorkspaceMember, {
+          by: `workspaceId`,
+        }),
+        conversations: rel.hasMany(Conversation, {
+          by: `workspaceId`,
+        }),
+        documents: rel.hasMany(Document, {
+          by: `workspaceId`,
+        }),
+      }),
+      WorkspaceMember: WorkspaceMember.relations({
+        member: rel.belongsTo(User, {
+          from: `userId`,
+          to: `id`,
+        }),
+        workspace: rel.belongsTo(Workspace, {
+          from: `workspaceId`,
+          to: `id`,
+        }),
+      }),
+      Document: Document.relations({
+        workspace: rel.belongsTo(Workspace, {
+          from: `workspaceId`,
+          to: `id`,
+        }),
+      }),
+      Conversation: Conversation.relations({
+        workspace: rel.belongsTo(Workspace, {
+          from: `workspaceId`,
+          to: `id`,
+        }),
+        messages: rel.hasMany(Message, {
+          by: `conversationId`,
+        }),
+      }),
+      Message: Message.relations({
+        conversation: rel.belongsTo(Conversation, {
+          from: `conversationId`,
+          to: `id`,
+        }),
       }),
     },
   };
