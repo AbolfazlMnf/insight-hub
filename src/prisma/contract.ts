@@ -1,4 +1,4 @@
-import { defineContract, member } from "@prisma/orm-postgres/contract-builder";
+import { defineContract } from "@prisma/orm-postgres/contract-builder";
 
 export const contract = defineContract({}, ({ field, model, rel }) => {
   const User = model(`User`, {
@@ -11,7 +11,7 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
       updatedAt: field.temporal.updatedAtString(),
     },
   });
-  const Workspace = model(`WorkSpace`, {
+  const Workspace = model(`Workspace`, {
     fields: {
       id: field.id.uuidv7String(),
       name: field.text(),
@@ -29,7 +29,11 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
       createdAt: field.temporal.createdAtString(),
       updatedAt: field.temporal.updatedAtString(),
     },
-  });
+  }).sql(({ cols, constraints }) => ({
+    indexes: [
+      constraints.index([cols.userId, cols.workspaceId], { unique: true }),
+    ],
+  }));
   const Document = model(`Document`, {
     fields: {
       id: field.id.uuidv7String(),
@@ -78,7 +82,7 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
         }),
       }),
       WorkspaceMember: WorkspaceMember.relations({
-        member: rel.belongsTo(User, {
+        user: rel.belongsTo(User, {
           from: `userId`,
           to: `id`,
         }),
