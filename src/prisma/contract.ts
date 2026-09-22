@@ -1,6 +1,16 @@
-import { defineContract } from "@prisma/orm-postgres/contract-builder";
+import {
+  defineContract,
+  nativeEnum,
+  pg,
+} from "@prisma/orm-postgres/contract-builder";
 
 export const contract = defineContract({}, ({ field, model, rel }) => {
+  const WorkspaceMemberRole = nativeEnum(
+    `WorkspaceMemberRole`,
+    "ADMIN",
+    "MEMBER",
+    "OWNER",
+  );
   const User = model(`User`, {
     fields: {
       id: field.id.uuidv7String(),
@@ -25,7 +35,7 @@ export const contract = defineContract({}, ({ field, model, rel }) => {
       id: field.id.uuidv7String(),
       userId: field.uuidString(),
       workspaceId: field.uuidString(),
-      role: field.text(),
+      role: field.column(pg.enum(WorkspaceMemberRole)),
       createdAt: field.temporal.createdAtString(),
       updatedAt: field.temporal.updatedAtString(),
     },

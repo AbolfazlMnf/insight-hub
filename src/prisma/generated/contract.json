@@ -542,8 +542,11 @@
               "role": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
+                  "codecId": "pg/enum@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "typeName": "WorkspaceMemberRole"
+                  }
                 }
               },
               "updatedAt": {
@@ -641,6 +644,17 @@
     "namespaces": {
       "public": {
         "entries": {
+          "native_enum": {
+            "WorkspaceMemberRole": {
+              "kind": "postgres-enum",
+              "members": [
+                "ADMIN",
+                "MEMBER",
+                "OWNER"
+              ],
+              "typeName": "WorkspaceMemberRole"
+            }
+          },
           "table": {
             "Conversation": {
               "columns": {
@@ -918,9 +932,18 @@
                   }
                 },
                 "role": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": false
+                  "codecId": "pg/enum@1",
+                  "nativeType": "WorkspaceMemberRole",
+                  "nullable": false,
+                  "typeParams": {
+                    "typeName": "WorkspaceMemberRole"
+                  },
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "WorkspaceMemberRole",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
@@ -963,13 +986,23 @@
               },
               "uniques": []
             }
+          },
+          "valueSet": {
+            "WorkspaceMemberRole": {
+              "kind": "valueSet",
+              "values": [
+                "ADMIN",
+                "MEMBER",
+                "OWNER"
+              ]
+            }
           }
         },
         "id": "public",
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "5d01f52d437a037d33dcb98fd4cd0cca9539806b434c1b5e6a824e34af373416"
+    "storageHash": "0cf18092f5382197e0e3cf46f8d12e3182808a0fd8a8c8992a13dee7c0496603"
   },
   "execution": {
     "executionHash": "15524ed120e57ad0a0290a23d3341edb4d3ef486c284837b97a48785638a6821",
