@@ -36,9 +36,7 @@ export class WorkspaceService {
         workspace: true,
       },
     });
-    if (!workspaces) {
-      throw new NotFoundException();
-    }
+
     return workspaces;
   }
   async getCurrentMember(currentUserId: string, workspaceId: string) {
@@ -102,10 +100,7 @@ export class WorkspaceService {
     return newWorkspaceMember;
   }
   async getWorkspaceMembers(currentUserId: string, workspaceId: string) {
-    const currentMember = await this.getCurrentMember(
-      currentUserId,
-      workspaceId,
-    );
+    await this.getCurrentMember(currentUserId, workspaceId);
     const workspaceUsers = await this.prismaService.workspaceMember.findMany({
       where: { workspaceId },
       select: {
@@ -114,10 +109,10 @@ export class WorkspaceService {
         updatedAt: true,
         user: {
           select: {
+            id: true,
             name: true,
             username: true,
             email: true,
-            role: true,
           },
         },
       },

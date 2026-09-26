@@ -31,7 +31,7 @@ export class WorkspaceController {
       workspaceId,
     );
   }
-  @Post(`:id/members`)
+  @Get(`:id/members`)
   getWorkspaceMembers(@User() currentUserId: string, @Param(`id`) id: string) {
     return this.workspaceService.getWorkspaceMembers(currentUserId, id);
   }

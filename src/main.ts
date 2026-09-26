@@ -17,9 +17,16 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new PrismaExceptionFilter());
-  const config = new DocumentBuilder().setTitle(`Insight-Hub`).build();
+  const config = new DocumentBuilder()
+    .setTitle(`Insight-Hub`)
+    .addBearerAuth()
+    .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(`/documentation`, app, document);
+  SwaggerModule.setup(`/documentation`, app, document, {
+    swaggerOptions: {
+      defaultModelsExpandDepth: -1,
+    },
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

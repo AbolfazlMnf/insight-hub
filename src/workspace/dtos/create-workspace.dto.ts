@@ -10,5 +10,6 @@ export class CreateWorkspaceDto {
   @IsString()
   @IsNotEmpty()
   @Matches(/^[a-z0-9-]+$/)
+  @ApiProperty()
   slug!: string;
 }
