@@ -41,6 +41,17 @@ export class WorkspaceService {
     }
     return workspaces;
   }
+  async getCurrentMember(currentUserId: string, workspaceId: string) {
+    const currentMember = await this.prismaService.workspaceMember.findUnique({
+      where: {
+        userId_workspaceId: { userId: currentUserId, workspaceId },
+      },
+    });
+    if (!currentMember) {
+      throw new ForbiddenException();
+    }
+    return currentMember;
+  }
   async getWorkSpace(id: string, userId: string) {
     const workspace = await this.prismaService.workspaceMember.findUnique({
       where: { userId_workspaceId: { userId, workspaceId: id } },
@@ -57,15 +68,13 @@ export class WorkspaceService {
     workspaceId: string,
   ) {
     const { targetUserId, role } = body;
-    const currentMember = await this.prismaService.workspaceMember.findUnique({
-      where: {
-        userId_workspaceId: { userId: currentUserId, workspaceId },
-      },
-    });
+    const currentMember = await this.getCurrentMember(
+      currentUserId,
+      workspaceId,
+    );
     if (
-      !currentMember ||
-      (currentMember.role !== WorkspaceRole.ADMIN &&
-        currentMember.role !== WorkspaceRole.OWNER)
+      currentMember.role !== WorkspaceRole.ADMIN &&
+      currentMember.role !== WorkspaceRole.OWNER
     ) {
       throw new ForbiddenException();
     }
@@ -91,5 +100,31 @@ export class WorkspaceService {
       },
     });
     return newWorkspaceMember;
+  }
+  async getWorkspaceMembers(currentUserId: string, workspaceId: string) {
+    const currentMember = await this.getCurrentMember(
+      currentUserId,
+      workspaceId,
+    );
+    const workspaceUsers = await this.prismaService.workspaceMember.findMany({
+      where: { workspaceId },
+      select: {
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            name: true,
+            username: true,
+            email: true,
+            role: true,
+          },
+        },
+      },
+    });
+    if (!workspaceUsers) {
+      throw new NotFoundException();
+    }
+    return workspaceUsers;
   }
 }
