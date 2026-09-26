@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
-export class createWorkspaceDto {
+export class CreateWorkspaceDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
