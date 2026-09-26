@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
+import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
 
 @Controller('workspace')
 @ApiBearerAuth()
@@ -54,6 +56,18 @@ export class WorkspaceController {
       userId,
       body,
       workspaceId,
+    );
+  }
+  @Patch(`:id/members/role`)
+  changeMemberRole(
+    @Param(`id`) workspaceId: string,
+    @Body() body: ChangeWorkspaceMemberRoleDto,
+    @User() currentUserId: string,
+  ) {
+    return this.workspaceService.changeWorkspaceMemberRole(
+      body,
+      workspaceId,
+      currentUserId,
     );
   }
 }

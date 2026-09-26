@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
+import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -160,6 +162,36 @@ export class WorkspaceService {
 
     await this.prismaService.workspaceMember.delete({
       where: { userId_workspaceId: { userId: targetUserId, workspaceId } },
+    });
+    return {
+      message: 'Member removed successfully',
+    };
+  }
+  async changeWorkspaceMemberRole(
+    body: ChangeWorkspaceMemberRoleDto,
+    currentUserId: string,
+    workspaceId: string,
+  ) {
+    const { targetUserId, role } = body;
+    if (role === WorkspaceRole.OWNER) {
+      throw new BadRequestException(`cant change role to owner`);
+    }
+    const currentMember = await this.getCurrentMember(
+      currentUserId,
+      workspaceId,
+    );
+    if (currentMember.role !== WorkspaceRole.OWNER) {
+      throw new ForbiddenException('Only owner can change member roles');
+    }
+    const targetMember = await this.getTargetMember(targetUserId, workspaceId);
+    if (targetMember.role === WorkspaceRole.OWNER) {
+      throw new ForbiddenException(`cant change owner's role`);
+    }
+    return this.prismaService.workspaceMember.update({
+      where: { userId_workspaceId: { userId: targetUserId, workspaceId } },
+      data: {
+        role,
+      },
     });
   }
 }
