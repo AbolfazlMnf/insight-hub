@@ -1,10 +1,19 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateWorkspaceDto } from './dtos/create-workspace.dto';
 import { User } from 'src/shared/decorators/user.decorator';
 import { WorkspaceService } from './workspace.service';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
+import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 
 @Controller('workspace')
 @ApiBearerAuth()
@@ -34,5 +43,17 @@ export class WorkspaceController {
   @Get(`:id/members`)
   getWorkspaceMembers(@User() currentUserId: string, @Param(`id`) id: string) {
     return this.workspaceService.getWorkspaceMembers(currentUserId, id);
+  }
+  @Delete(`:id/members`)
+  removeWorkspaceMember(
+    @Param(`id`) workspaceId: string,
+    @User() userId: string,
+    @Body() body: RemoveWorkSpaceMemberDto,
+  ) {
+    return this.workspaceService.removeWorkspaceMember(
+      userId,
+      body,
+      workspaceId,
+    );
   }
 }

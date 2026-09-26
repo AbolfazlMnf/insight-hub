@@ -7,6 +7,7 @@ import { CreateWorkspaceDto } from './dtos/create-workspace.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
+import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -49,6 +50,17 @@ export class WorkspaceService {
       throw new ForbiddenException();
     }
     return currentMember;
+  }
+  async getTargetMember(targetUserId: string, workspaceId: string) {
+    const targetMember = await this.prismaService.workspaceMember.findUnique({
+      where: {
+        userId_workspaceId: { userId: targetUserId, workspaceId },
+      },
+    });
+    if (!targetMember) {
+      throw new NotFoundException(`member not found`);
+    }
+    return targetMember;
   }
   async getWorkSpace(id: string, userId: string) {
     const workspace = await this.prismaService.workspaceMember.findUnique({
@@ -121,5 +133,33 @@ export class WorkspaceService {
       throw new NotFoundException();
     }
     return workspaceUsers;
+  }
+  async removeWorkspaceMember(
+    currentUserId: string,
+    body: RemoveWorkSpaceMemberDto,
+    workspaceId: string,
+  ) {
+    const { targetUserId } = body;
+    const currentMember = await this.getCurrentMember(
+      currentUserId,
+      workspaceId,
+    );
+    if (currentMember.role === WorkspaceRole.MEMBER) {
+      throw new ForbiddenException();
+    }
+    const targetMember = await this.getTargetMember(targetUserId, workspaceId);
+    if (
+      currentMember.role === WorkspaceRole.ADMIN &&
+      targetMember.role !== WorkspaceRole.MEMBER
+    ) {
+      throw new ForbiddenException(`admin just can delete member`);
+    }
+    if (targetMember.role === WorkspaceRole.OWNER) {
+      throw new ForbiddenException(`owner cant be removed`);
+    }
+
+    await this.prismaService.workspaceMember.delete({
+      where: { userId_workspaceId: { userId: targetUserId, workspaceId } },
+    });
   }
 }
