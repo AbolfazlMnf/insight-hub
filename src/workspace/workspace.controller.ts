@@ -4,6 +4,7 @@ import { User } from 'src/shared/decorators/user.decorator';
 import { WorkspaceService } from './workspace.service';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 
 @Controller('workspace')
 @ApiBearerAuth()
@@ -17,5 +18,17 @@ export class WorkspaceController {
   @Get(`:id`)
   getWorkSpace(@Param(`id`) id: string, @User() userId: string) {
     return this.workspaceService.getWorkSpace(id, userId);
+  }
+  @Post(`:id/members`)
+  addWorkSpaceMember(
+    @Body() body: AddWorkspaceMemberDto,
+    @User() currentUserId: string,
+    @Param(`id`) workspaceId: string,
+  ) {
+    return this.workspaceService.addWorkspaceMember(
+      body,
+      currentUserId,
+      workspaceId,
+    );
   }
 }
