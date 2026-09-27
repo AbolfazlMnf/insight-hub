@@ -10,10 +10,12 @@ import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
+import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
 
 @Injectable()
 export class WorkspaceService {
   constructor(private readonly prismaService: PrismaService) {}
+
   async createWorkspace(body: CreateWorkspaceDto, userId: string) {
     return this.prismaService.$transaction(async (tx) => {
       const workspace = await tx.workspace.create({
@@ -193,5 +195,37 @@ export class WorkspaceService {
         role,
       },
     });
+  }
+  async updateWorkspace(
+    body: UpdateWorkspaceDto,
+    currentUserId: string,
+    workspaceId: string,
+  ) {
+    const currentMember = await this.getCurrentMember(
+      currentUserId,
+      workspaceId,
+    );
+    if (currentMember.role === WorkspaceRole.MEMBER) {
+      throw new ForbiddenException(`member cant update workspace !!`);
+    }
+    const updatedWorkspace = await this.prismaService.workspace.update({
+      where: { id: workspaceId },
+      data: {
+        name: body.name,
+        slug: body.slug,
+      },
+    });
+    return updatedWorkspace;
+  }
+  async deleteWorkspace(currentUserId: string, workspaceId: string) {
+    const currentMember = await this.getCurrentMember(
+      currentUserId,
+      workspaceId,
+    );
+    if (currentMember.role !== WorkspaceRole.OWNER) {
+      throw new ForbiddenException(`only owner can delete workspace`);
+    }
+    await this.prismaService.workspace.delete({ where: { id: workspaceId } });
+    return { message: `workspace deleted successfully` };
   }
 }

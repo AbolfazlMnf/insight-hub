@@ -16,6 +16,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
+import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
 
 @Controller('workspace')
 @ApiBearerAuth()
@@ -25,6 +26,10 @@ export class WorkspaceController {
   @Post(`create`)
   createWorkspace(@Body() body: CreateWorkspaceDto, @User() userId: string) {
     return this.workspaceService.createWorkspace(body, userId);
+  }
+  @Get()
+  getUserWorkspaces(@User() userId: string) {
+    return this.workspaceService.getUserWorkspaces(userId);
   }
   @Get(`:id`)
   getWorkSpace(@Param(`id`) id: string, @User() userId: string) {
@@ -58,6 +63,27 @@ export class WorkspaceController {
       workspaceId,
     );
   }
+  @Patch(`:id`)
+  updateWorkspace(
+    @Body() body: UpdateWorkspaceDto,
+    @Param(`id`) workspaceId: string,
+    @User() currentUserId: string,
+  ) {
+    return this.workspaceService.updateWorkspace(
+      body,
+      currentUserId,
+      workspaceId,
+    );
+  }
+
+  @Delete(`:id`)
+  deleteWorkspace(
+    @Param(`id`) workspaceId: string,
+    @User() currentUserId: string,
+  ) {
+    return this.workspaceService.deleteWorkspace(currentUserId, workspaceId);
+  }
+
   @Patch(`:id/members/role`)
   changeMemberRole(
     @Param(`id`) workspaceId: string,
