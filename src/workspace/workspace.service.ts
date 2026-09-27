@@ -12,6 +12,7 @@ import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
 import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
 import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
+import { getPagination, getPaginationMeta } from 'src/shared/utils/pagintaion';
 
 @Injectable()
 export class WorkspaceService {
@@ -37,7 +38,7 @@ export class WorkspaceService {
   }
   async getUserWorkspaces(userId: string, query: WorkspaceQueryDto) {
     const { page, limit, role, search } = query;
-    const skip = (page - 1) * limit;
+    const { skip, take } = getPagination(page, limit);
     const where = {
       userId,
       workspace: {
@@ -55,20 +56,18 @@ export class WorkspaceService {
           workspace: true,
         },
         skip,
-        take: limit,
+        take,
       }),
       this.prismaService.workspaceMember.count({
         where,
       }),
     ]);
+
+    const meta = getPaginationMeta(page, limit, count);
+
     return {
       workspaces,
-      meta: {
-        page,
-        limit,
-        totalCount: count,
-        totalPage: Math.ceil(count / limit),
-      },
+      meta,
     };
   }
   async getCurrentMember(currentUserId: string, workspaceId: string) {
