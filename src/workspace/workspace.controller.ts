@@ -8,38 +8,79 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
+
 import { CreateWorkspaceDto } from './dtos/create-workspace.dto';
-import { User } from 'src/shared/decorators/user.decorator';
-import { WorkspaceService } from './workspace.service';
-import { JwtGuard } from 'src/shared/guards/jwt.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
 import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
 
-@Controller('workspace')
+import { WorkspaceService } from './workspace.service';
+
+import { User } from 'src/shared/decorators/user.decorator';
+import { JwtGuard } from 'src/shared/guards/jwt.guard';
+
+@ApiTags('Workspace')
 @ApiBearerAuth()
 @UseGuards(JwtGuard)
+@Controller('workspace')
 export class WorkspaceController {
   constructor(private readonly workspaceService: WorkspaceService) {}
-  @Post(`create`)
+
+  @Post('create')
+  @ApiOperation({
+    summary: 'Create a new workspace',
+    description:
+      'Creates a workspace and assigns the authenticated user as its owner.',
+  })
   createWorkspace(@Body() body: CreateWorkspaceDto, @User() userId: string) {
     return this.workspaceService.createWorkspace(body, userId);
   }
+
   @Get()
+  @ApiOperation({
+    summary: 'Get user workspaces',
+    description:
+      'Returns all workspaces that the authenticated user is a member of.',
+  })
   getUserWorkspaces(@User() userId: string) {
     return this.workspaceService.getUserWorkspaces(userId);
   }
-  @Get(`:id`)
-  getWorkSpace(@Param(`id`) id: string, @User() userId: string) {
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Get workspace',
+    description:
+      'Returns a workspace if the authenticated user is a member of it.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Workspace ID',
+  })
+  getWorkSpace(@Param('id') id: string, @User() userId: string) {
     return this.workspaceService.getWorkSpace(id, userId);
   }
-  @Post(`:id/members`)
+
+  @Post(':id/members')
+  @ApiOperation({
+    summary: 'Add workspace member',
+    description:
+      'Adds a new member to the workspace. Owner can add admins or members. Admin can only add members.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Workspace ID',
+  })
   addWorkSpaceMember(
     @Body() body: AddWorkspaceMemberDto,
     @User() currentUserId: string,
-    @Param(`id`) workspaceId: string,
+    @Param('id') workspaceId: string,
   ) {
     return this.workspaceService.addWorkspaceMember(
       body,
@@ -47,26 +88,84 @@ export class WorkspaceController {
       workspaceId,
     );
   }
-  @Get(`:id/members`)
-  getWorkspaceMembers(@User() currentUserId: string, @Param(`id`) id: string) {
-    return this.workspaceService.getWorkspaceMembers(currentUserId, id);
+
+  @Get(':id/members')
+  @ApiOperation({
+    summary: 'Get workspace members',
+    description:
+      'Returns the members of a workspace. The authenticated user must be a member of the workspace.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Workspace ID',
+  })
+  getWorkspaceMembers(
+    @User() currentUserId: string,
+    @Param('id') workspaceId: string,
+  ) {
+    return this.workspaceService.getWorkspaceMembers(
+      currentUserId,
+      workspaceId,
+    );
   }
-  @Delete(`:id/members`)
+
+  @Delete(':id/members')
+  @ApiOperation({
+    summary: 'Remove workspace member',
+    description:
+      'Removes a member from the workspace based on the current user workspace role.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Workspace ID',
+  })
   removeWorkspaceMember(
-    @Param(`id`) workspaceId: string,
-    @User() userId: string,
+    @Param('id') workspaceId: string,
+    @User() currentUserId: string,
     @Body() body: RemoveWorkSpaceMemberDto,
   ) {
     return this.workspaceService.removeWorkspaceMember(
-      userId,
+      currentUserId,
       body,
       workspaceId,
     );
   }
-  @Patch(`:id`)
+
+  @Patch(':id/members/role')
+  @ApiOperation({
+    summary: 'Change workspace member role',
+    description:
+      'Changes a member role between ADMIN and MEMBER. Only the workspace owner can perform this operation.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Workspace ID',
+  })
+  changeMemberRole(
+    @Param('id') workspaceId: string,
+    @Body() body: ChangeWorkspaceMemberRoleDto,
+    @User() currentUserId: string,
+  ) {
+    return this.workspaceService.changeWorkspaceMemberRole(
+      body,
+      currentUserId,
+      workspaceId,
+    );
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary: 'Update workspace',
+    description:
+      'Updates workspace information. Owner and admin can update the workspace.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Workspace ID',
+  })
   updateWorkspace(
     @Body() body: UpdateWorkspaceDto,
-    @Param(`id`) workspaceId: string,
+    @Param('id') workspaceId: string,
     @User() currentUserId: string,
   ) {
     return this.workspaceService.updateWorkspace(
@@ -76,24 +175,20 @@ export class WorkspaceController {
     );
   }
 
-  @Delete(`:id`)
+  @Delete(':id')
+  @ApiOperation({
+    summary: 'Delete workspace',
+    description:
+      'Permanently deletes a workspace. Only the workspace owner can perform this operation.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Workspace ID',
+  })
   deleteWorkspace(
-    @Param(`id`) workspaceId: string,
+    @Param('id') workspaceId: string,
     @User() currentUserId: string,
   ) {
     return this.workspaceService.deleteWorkspace(currentUserId, workspaceId);
-  }
-
-  @Patch(`:id/members/role`)
-  changeMemberRole(
-    @Param(`id`) workspaceId: string,
-    @Body() body: ChangeWorkspaceMemberRoleDto,
-    @User() currentUserId: string,
-  ) {
-    return this.workspaceService.changeWorkspaceMemberRole(
-      body,
-      workspaceId,
-      currentUserId,
-    );
   }
 }
