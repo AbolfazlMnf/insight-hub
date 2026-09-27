@@ -37,7 +37,8 @@ export class WorkspaceService {
     });
   }
   async getUserWorkspaces(userId: string, query: WorkspaceQueryDto) {
-    const { page, limit, role, search } = query;
+    const { page, limit, role, search, sortBy, sortOrder } = query;
+
     const { skip, take } = getPagination(page, limit);
     const where = {
       userId,
@@ -57,6 +58,11 @@ export class WorkspaceService {
         },
         skip,
         take,
+        orderBy: {
+          workspace: {
+            [sortBy]: sortOrder,
+          },
+        },
       }),
       this.prismaService.workspaceMember.count({
         where,
@@ -66,7 +72,7 @@ export class WorkspaceService {
     const meta = getPaginationMeta(page, limit, count);
 
     return {
-      workspaces,
+      data: workspaces,
       meta,
     };
   }
