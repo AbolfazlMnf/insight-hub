@@ -11,6 +11,7 @@ import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
 import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
+import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -34,15 +35,41 @@ export class WorkspaceService {
       return workspace;
     });
   }
-  async getUserWorkspaces(userId: string) {
-    const workspaces = await this.prismaService.workspaceMember.findMany({
-      where: { userId },
-      include: {
-        workspace: true,
+  async getUserWorkspaces(userId: string, query: WorkspaceQueryDto) {
+    const { page, limit, role, search } = query;
+    const skip = (page - 1) * limit;
+    const where = {
+      userId,
+      workspace: {
+        name: {
+          contains: search,
+          mode: `insensitive` as const,
+        },
       },
-    });
-
-    return workspaces;
+      role,
+    };
+    const [workspaces, count] = await Promise.all([
+      this.prismaService.workspaceMember.findMany({
+        where,
+        include: {
+          workspace: true,
+        },
+        skip,
+        take: limit,
+      }),
+      this.prismaService.workspaceMember.count({
+        where,
+      }),
+    ]);
+    return {
+      workspaces,
+      meta: {
+        page,
+        limit,
+        totalCount: count,
+        totalPage: Math.ceil(count / limit),
+      },
+    };
   }
   async getCurrentMember(currentUserId: string, workspaceId: string) {
     const currentMember = await this.prismaService.workspaceMember.findUnique({

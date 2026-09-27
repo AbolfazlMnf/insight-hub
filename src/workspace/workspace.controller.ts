@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -25,6 +26,7 @@ import { WorkspaceService } from './workspace.service';
 
 import { User } from 'src/shared/decorators/user.decorator';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
+import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
@@ -49,8 +51,8 @@ export class WorkspaceController {
     description:
       'Returns all workspaces that the authenticated user is a member of.',
   })
-  getUserWorkspaces(@User() userId: string) {
-    return this.workspaceService.getUserWorkspaces(userId);
+  getUserWorkspaces(@User() userId: string, @Query() query: WorkspaceQueryDto) {
+    return this.workspaceService.getUserWorkspaces(userId, query);
   }
 
   @Get(':id')
