@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -22,6 +23,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { RoleGuard } from 'src/shared/guards/role.guard';
 import { UserRole } from 'src/generated/prisma/enums';
+import { UserQueryDto } from './dtos/user-query.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -44,8 +46,8 @@ export class UsersController {
   @ApiForbiddenResponse({
     description: 'Admin access is required.',
   })
-  getAll() {
-    return this.userService.findAll();
+  getAll(@Query() query: UserQueryDto) {
+    return this.userService.findAll(query);
   }
 
   @Get(':id')

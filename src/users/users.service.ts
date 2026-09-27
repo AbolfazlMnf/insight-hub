@@ -2,16 +2,43 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { UserQueryDto } from './dtos/user-query.dto';
+import { getPagination, getPaginationMeta } from 'src/shared/utils/pagintaion';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
-  async findAll() {
-    return this.prismaService.user.findMany({
-      omit: {
-        password: true,
-      },
-    });
+  async findAll(query: UserQueryDto) {
+    const { page, limit, search, sortBy, sortOrder } = query;
+    const { skip, take } = getPagination(page, limit);
+    const [users, count] = await Promise.all([
+      this.prismaService.user.findMany({
+        omit: {
+          password: true,
+        },
+        where: {
+          username: {
+            contains: search,
+            mode: `insensitive`,
+          },
+        },
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+        skip,
+        take,
+      }),
+      this.prismaService.user.count({
+        where: {
+          username: {
+            contains: search,
+            mode: `insensitive`,
+          },
+        },
+      }),
+    ]);
+    const meta = getPaginationMeta(page, limit, count);
+    return { data: users, meta };
   }
   async createUser(body: CreateUserDto) {
     const newUser = await this.prismaService.user.create({
