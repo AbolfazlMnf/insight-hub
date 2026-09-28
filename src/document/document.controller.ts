@@ -9,7 +9,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { UploadDocumentDto } from './dtos/upload-document.dto';
 import { UploadDocumentMulterOption } from 'src/shared/utils/upload.util';
@@ -17,6 +17,7 @@ import { User } from 'src/shared/decorators/user.decorator';
 import { DocumentService } from './document.service';
 
 @ApiTags(`Documents`)
+@ApiBearerAuth()
 @UseGuards(JwtGuard)
 @Controller('document')
 export class DocumentController {

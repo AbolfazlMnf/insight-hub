@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength } from 'class-validator';
+import { IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UploadDocumentDto {
   @ApiProperty({
@@ -10,5 +10,6 @@ export class UploadDocumentDto {
   title!: string;
 
   @ApiProperty({ type: `string`, format: `binary`, required: true })
-  file!: any;
+  @IsOptional()
+  file?: any;
 }
