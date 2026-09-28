@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Param,
+  ParseFilePipe,
   Post,
   UploadedFile,
   UseGuards,
@@ -23,6 +24,11 @@ export class DocumentController {
   uploadDoc(
     @Param(`workspaceId`) workspaceId: string,
     @Body() body: UploadDocumentDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+      }),
+    )
+    file: Express.Multer.File,
   ) {}
 }

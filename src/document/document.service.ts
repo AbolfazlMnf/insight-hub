@@ -1,5 +1,4 @@
 import { Injectable, Body } from '@nestjs/common';
-import { DocumentStatus } from 'src/generated/prisma/enums';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { WorkspaceService } from 'src/workspace/workspace.service';
 
