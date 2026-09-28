@@ -14,7 +14,7 @@ import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { UploadDocumentDto } from './dtos/upload-document.dto';
 import { UploadDocumentMulterOption } from 'src/shared/utils/upload.util';
 import { User } from 'src/shared/decorators/user.decorator';
-import { DocumentService } from './document.service';
+import { DocumentService } from './services/document.service';
 
 @ApiTags(`Documents`)
 @ApiBearerAuth()

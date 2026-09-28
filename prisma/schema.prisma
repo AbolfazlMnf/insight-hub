@@ -76,6 +76,8 @@ model Document {
   size     Int
   status   DocumentStatus @default(UPLOADED)
 
+  extractedText String?
+
   workspaceId  String
   uploadedById String?
 
