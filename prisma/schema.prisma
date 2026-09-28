@@ -27,6 +27,7 @@ model User {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
   memberships WorkspaceMember[]
+  documents   Document[]
 }
 
 model Workspace {
@@ -36,6 +37,7 @@ model Workspace {
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
   members   WorkspaceMember[]
+  documents Document[]
 }
 
 enum WorkspaceRole {
@@ -56,4 +58,30 @@ model WorkspaceMember {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
+}
+
+enum DocumentStatus {
+  UPLOADED
+  PROCESSING
+  READY
+  FAILED
+}
+
+model Document {
+  id       String         @id() @default(uuid())
+  title    String
+  fileName String
+  filePath String
+  mimeType String
+  size     Int
+  status   DocumentStatus @default(UPLOADED)
+
+  workspaceId  String
+  uploadedById String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  uploadedBy User?     @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
 }
