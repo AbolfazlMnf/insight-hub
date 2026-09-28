@@ -1,5 +1,6 @@
-import { Injectable, Body } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { removeFile } from 'src/shared/utils/file.util';
 import { WorkspaceService } from 'src/workspace/workspace.service';
 
 @Injectable()
@@ -15,19 +16,24 @@ export class DocumentService {
     userId: string,
   ) {
     console.log(file);
-    await this.workspaceService.getCurrentMember(userId, workspaceId);
+    try {
+      await this.workspaceService.getCurrentMember(userId, workspaceId);
 
-    const uploadedDoc = await this.prismaService.document.create({
-      data: {
-        title,
-        fileName: file.filename,
-        filePath: file.path,
-        mimeType: file.mimetype,
-        size: file.size,
-        uploadedById: userId,
-        workspaceId,
-      },
-    });
-    return { message: `document uploaded successfully`, uploadedDoc };
+      const uploadedDoc = await this.prismaService.document.create({
+        data: {
+          title,
+          fileName: file.originalname,
+          filePath: file.path,
+          mimeType: file.mimetype,
+          size: file.size,
+          uploadedById: userId,
+          workspaceId,
+        },
+      });
+      return { message: `document uploaded successfully`, uploadedDoc };
+    } catch (error) {
+      await removeFile(file.path);
+      throw error;
+    }
   }
 }
