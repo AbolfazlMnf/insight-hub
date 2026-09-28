@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WorkspaceModule } from './workspace/workspace.module';
+import { DocumentModule } from './document/document.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { WorkspaceModule } from './workspace/workspace.module';
       secret: process.env.JWT_SECRET!,
     }),
     WorkspaceModule,
+    DocumentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
