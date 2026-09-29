@@ -2,12 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { removeFile } from 'src/shared/utils/file.util';
 import { WorkspaceService } from 'src/workspace/workspace.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { DOCUMENT_PROCESSING_QUEUE } from '../constants/document-queue.constant';
 
 @Injectable()
 export class DocumentService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly workspaceService: WorkspaceService,
+    @InjectQueue(DOCUMENT_PROCESSING_QUEUE)
+    private readonly documentQueue: Queue,
   ) {}
   async uploadDocument(
     file: Express.Multer.File,
@@ -30,7 +35,15 @@ export class DocumentService {
           workspaceId,
         },
       });
-      return { message: `document uploaded successfully`, uploadedDoc };
+      try {
+        await this.documentQueue.add(`process-document`, {
+          documentId: uploadedDoc.id,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+
+      return uploadedDoc;
     } catch (error) {
       await removeFile(file.path);
       throw error;

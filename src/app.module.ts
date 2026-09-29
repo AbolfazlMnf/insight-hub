@@ -8,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { DocumentModule } from './document/document.module';
-
+import { BullModule } from '@nestjs/bullmq';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +24,12 @@ import { DocumentModule } from './document/document.module';
     }),
     WorkspaceModule,
     DocumentModule,
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST!,
+        port: Number(process.env.REDIS_PORT!),
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
