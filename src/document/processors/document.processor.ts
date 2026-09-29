@@ -16,6 +16,7 @@ export class DocumentProcessor extends WorkerHost {
   }
   async process(job: Job<IProcessDocumentJobData>) {
     if (job.name === PROCESS_DOCUMENT_JOB) {
+      console.log(`processing started`);
       await this.documentProcessorService.processDocument(job.data.documentId);
     }
   }

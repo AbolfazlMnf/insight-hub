@@ -24,7 +24,6 @@ export class DocumentService {
     workspaceId: string,
     userId: string,
   ) {
-    console.log(file);
     try {
       await this.workspaceService.getCurrentMember(userId, workspaceId);
 
