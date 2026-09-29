@@ -4,7 +4,11 @@ import { removeFile } from 'src/shared/utils/file.util';
 import { WorkspaceService } from 'src/workspace/workspace.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { DOCUMENT_PROCESSING_QUEUE } from '../constants/document-queue.constant';
+import {
+  DOCUMENT_PROCESSING_QUEUE,
+  PROCESS_DOCUMENT_JOB,
+} from '../constants/document-queue.constant';
+import { IProcessDocumentJobData } from '../types/document-job.type';
 
 @Injectable()
 export class DocumentService {
@@ -12,7 +16,7 @@ export class DocumentService {
     private readonly prismaService: PrismaService,
     private readonly workspaceService: WorkspaceService,
     @InjectQueue(DOCUMENT_PROCESSING_QUEUE)
-    private readonly documentQueue: Queue,
+    private readonly documentQueue: Queue<IProcessDocumentJobData>,
   ) {}
   async uploadDocument(
     file: Express.Multer.File,
@@ -36,7 +40,7 @@ export class DocumentService {
         },
       });
       try {
-        await this.documentQueue.add(`process-document`, {
+        await this.documentQueue.add(PROCESS_DOCUMENT_JOB, {
           documentId: uploadedDoc.id,
         });
       } catch (err) {
