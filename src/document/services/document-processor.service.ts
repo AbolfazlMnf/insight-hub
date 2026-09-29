@@ -35,19 +35,20 @@ export class DocumentProcessorService {
     return document;
   }
   async processDocument(documentId: string) {
-    const document = await this.findDocument(documentId);
-    if (document.mimeType !== `application/pdf`) {
-      throw new BadRequestException('Unsupported document type');
-    }
-
-    await this.prismaService.document.update({
-      where: { id: documentId },
-      data: { status: DocumentStatus.PROCESSING },
-    });
     try {
+      const document = await this.findDocument(documentId);
+      if (document.mimeType !== `application/pdf`) {
+        throw new BadRequestException('Unsupported document type');
+      }
+
+      await this.prismaService.document.update({
+        where: { id: documentId },
+        data: { status: DocumentStatus.PROCESSING },
+      });
+
       const extractedText = await this.extractPdfText(document.filePath);
       if (!extractedText.trim()) {
-        throw new BadRequestException('No text extracted from document');
+        throw new Error('No text extracted from document');
       }
 
       const updatedDoc = await this.prismaService.document.update({
