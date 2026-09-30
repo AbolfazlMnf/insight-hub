@@ -1,17 +1,18 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   DOCUMENT_REPOSITORY,
-  Document_TEXT_EXTRACTOR,
+  DOCUMENT_TEXT_EXTRACTOR,
 } from 'src/document/constants/document.token';
 import type { DocumentRepository } from 'src/document/domain/repositories/document.repository';
 import type { DocumentTextExtractor } from '../ports/Document-text-extractor.port';
 import { DocumentStatus } from 'src/generated/prisma/enums';
 
+@Injectable()
 export class ProcessDocumentUseCase {
   constructor(
     @Inject(DOCUMENT_REPOSITORY)
     private readonly documentRepository: DocumentRepository,
-    @Inject(Document_TEXT_EXTRACTOR)
+    @Inject(DOCUMENT_TEXT_EXTRACTOR)
     private readonly documentTextExtractor: DocumentTextExtractor,
   ) {}
   async execute(documentId: string) {
