@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DocumentService } from './services/document.service';
 import { WorkspaceModule } from 'src/workspace/workspace.module';
-import { DocumentProcessorService } from './services/document-processor.service';
 import { BullModule } from '@nestjs/bullmq';
 import { DOCUMENT_PROCESSING_QUEUE } from './constants/document-queue.constant';
 import { PrismaDocumentRepository } from './infrastructure/persistence/prisma-document.repository';
@@ -17,6 +15,7 @@ import { DocumentProcessor } from './infrastructure/queues/document-processor';
 import { DocumentController } from './presentation/document.controller';
 import { BullDocumentProcessingQueue } from './infrastructure/queues/bull-document-processing.queue';
 import { LocalFileStorage } from './infrastructure/storage/local-file-storage';
+import { UploadDocumentUseCase } from './application/use-cases/upload-document.use-case';
 
 @Module({
   imports: [
@@ -26,13 +25,13 @@ import { LocalFileStorage } from './infrastructure/storage/local-file-storage';
     }),
   ],
   providers: [
-    DocumentService,
-    DocumentProcessorService,
     DocumentProcessor,
     PrismaDocumentRepository,
     pdfTextExtractor,
     BullDocumentProcessingQueue,
     LocalFileStorage,
+    UploadDocumentUseCase,
+
     {
       provide: DOCUMENT_REPOSITORY,
       useExisting: PrismaDocumentRepository,

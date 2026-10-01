@@ -1,11 +1,11 @@
 import { Inject } from '@nestjs/common';
 import {
+  DOCUMENT_PROCESSING_QUEUE_PORT,
   DOCUMENT_REPOSITORY,
   FILE_STORAGE,
 } from 'src/document/constants/document.token';
 import type { DocumentRepository } from 'src/document/domain/repositories/document.repository';
 import type { DocumentProcessingQueue } from '../ports/document-processing-queue.port';
-import { DOCUMENT_PROCESSING_QUEUE } from 'src/document/constants/document-queue.constant';
 import { WorkspaceService } from 'src/workspace/workspace.service';
 import { IUploadDocumentInput } from '../types/upload-document-input.type';
 import type { FileStorage } from '../ports/file.storage.port';
@@ -14,7 +14,7 @@ export class UploadDocumentUseCase {
   constructor(
     @Inject(DOCUMENT_REPOSITORY)
     private readonly documentRepository: DocumentRepository,
-    @Inject(DOCUMENT_PROCESSING_QUEUE)
+    @Inject(DOCUMENT_PROCESSING_QUEUE_PORT)
     private readonly documentProcessingQueue: DocumentProcessingQueue,
     private readonly workspaceService: WorkspaceService,
     @Inject(FILE_STORAGE) private readonly fileStorage: FileStorage,
