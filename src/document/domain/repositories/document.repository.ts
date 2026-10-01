@@ -17,4 +17,5 @@ export interface DocumentRepository {
     extractedText: string,
     status: DocumentStatus,
   ): Promise<Document>;
+  deleteById(documentId: string): Promise<void>;
 }

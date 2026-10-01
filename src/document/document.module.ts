@@ -9,12 +9,14 @@ import {
   DOCUMENT_PROCESSING_QUEUE_PORT,
   DOCUMENT_REPOSITORY,
   DOCUMENT_TEXT_EXTRACTOR,
+  FILE_STORAGE,
 } from './constants/document.token';
 import { pdfTextExtractor } from './infrastructure/parsing/pdf-text-extractor';
 import { ProcessDocumentUseCase } from './application/use-cases/process-document.use-case';
 import { DocumentProcessor } from './infrastructure/queues/document-processor';
 import { DocumentController } from './presentation/document.controller';
 import { BullDocumentProcessingQueue } from './infrastructure/queues/bull-document-processing.queue';
+import { LocalFileStorage } from './infrastructure/storage/local-file-storage';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { BullDocumentProcessingQueue } from './infrastructure/queues/bull-docume
     PrismaDocumentRepository,
     pdfTextExtractor,
     BullDocumentProcessingQueue,
+    LocalFileStorage,
     {
       provide: DOCUMENT_REPOSITORY,
       useExisting: PrismaDocumentRepository,
@@ -41,6 +44,10 @@ import { BullDocumentProcessingQueue } from './infrastructure/queues/bull-docume
     {
       provide: DOCUMENT_PROCESSING_QUEUE_PORT,
       useExisting: BullDocumentProcessingQueue,
+    },
+    {
+      provide: FILE_STORAGE,
+      useExisting: LocalFileStorage,
     },
     ProcessDocumentUseCase,
   ],

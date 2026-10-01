@@ -52,4 +52,11 @@ export class PrismaDocumentRepository implements DocumentRepository {
       },
     });
   }
+  async deleteById(documentId: string): Promise<void> {
+    await this.prismaService.document.delete({
+      where: {
+        id: documentId,
+      },
+    });
+  }
 }

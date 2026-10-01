@@ -3,3 +3,4 @@ export const DOCUMENT_TEXT_EXTRACTOR = Symbol(`Document_TEXT_EXTRACTOR`);
 export const DOCUMENT_PROCESSING_QUEUE_PORT = Symbol(
   `DOCUMENT_PROCESSING_QUEUE_PORT`,
 );
+export const FILE_STORAGE = Symbol(`FILE_STORAGE`);
