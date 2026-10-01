@@ -1,11 +1,12 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
+
+import { Job } from 'bullmq';
+import { IProcessDocumentJobData } from 'src/document/application/types/document-job.type';
+import { ProcessDocumentUseCase } from 'src/document/application/use-cases/process-document.use-case';
 import {
   DOCUMENT_PROCESSING_QUEUE,
   PROCESS_DOCUMENT_JOB,
-} from '../constants/document-queue.constant';
-import { Job } from 'bullmq';
-import { IProcessDocumentJobData } from '../types/document-job.type';
-import { ProcessDocumentUseCase } from '../application/use-cases/process-document.use-case';
+} from 'src/document/constants/document-queue.constant';
 
 @Processor(DOCUMENT_PROCESSING_QUEUE)
 export class DocumentProcessor extends WorkerHost {
