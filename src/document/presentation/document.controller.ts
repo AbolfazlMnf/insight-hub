@@ -11,17 +11,17 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
-import { UploadDocumentDto } from './dtos/upload-document.dto';
 import { UploadDocumentMulterOption } from 'src/shared/utils/upload.util';
 import { User } from 'src/shared/decorators/user.decorator';
-import { DocumentService } from './services/document.service';
+import { UploadDocumentUseCase } from '../application/use-cases/upload-document.use-case';
+import { UploadDocumentDto } from '../dtos/upload-document.dto';
 
 @ApiTags(`Documents`)
 @ApiBearerAuth()
 @UseGuards(JwtGuard)
 @Controller('document')
 export class DocumentController {
-  constructor(private readonly documentService: DocumentService) {}
+  constructor(private readonly uploadDocumentUseCase: UploadDocumentUseCase) {}
 
   @Post(`upload/:workspaceId`)
   @UseInterceptors(FileInterceptor(`file`, UploadDocumentMulterOption))
@@ -37,11 +37,14 @@ export class DocumentController {
     file: Express.Multer.File,
     @User() userId: string,
   ) {
-    return this.documentService.uploadDocument(
-      file,
-      body.title,
-      workspaceId,
+    return this.uploadDocumentUseCase.execute({
+      title: body.title,
       userId,
-    );
+      workspaceId,
+      fileName: file.originalname,
+      filePath: file.path,
+      size: file.size,
+      mimeType: file.mimetype,
+    });
   }
 }

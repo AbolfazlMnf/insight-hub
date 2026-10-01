@@ -6,13 +6,15 @@ import { BullModule } from '@nestjs/bullmq';
 import { DOCUMENT_PROCESSING_QUEUE } from './constants/document-queue.constant';
 import { PrismaDocumentRepository } from './infrastructure/persistence/prisma-document.repository';
 import {
+  DOCUMENT_PROCESSING_QUEUE_PORT,
   DOCUMENT_REPOSITORY,
   DOCUMENT_TEXT_EXTRACTOR,
 } from './constants/document.token';
 import { pdfTextExtractor } from './infrastructure/parsing/pdf-text-extractor';
 import { ProcessDocumentUseCase } from './application/use-cases/process-document.use-case';
-import { DocumentProcessor } from './infrastructure/queues/document.processor';
+import { DocumentProcessor } from './infrastructure/queues/document-processor';
 import { DocumentController } from './presentation/document.controller';
+import { BullDocumentProcessingQueue } from './infrastructure/queues/bull-document-processing.queue';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { DocumentController } from './presentation/document.controller';
     DocumentProcessor,
     PrismaDocumentRepository,
     pdfTextExtractor,
+    BullDocumentProcessingQueue,
     {
       provide: DOCUMENT_REPOSITORY,
       useExisting: PrismaDocumentRepository,
@@ -34,6 +37,10 @@ import { DocumentController } from './presentation/document.controller';
     {
       provide: DOCUMENT_TEXT_EXTRACTOR,
       useExisting: pdfTextExtractor,
+    },
+    {
+      provide: DOCUMENT_PROCESSING_QUEUE_PORT,
+      useExisting: BullDocumentProcessingQueue,
     },
     ProcessDocumentUseCase,
   ],
