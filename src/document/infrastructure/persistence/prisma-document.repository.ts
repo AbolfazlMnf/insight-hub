@@ -1,7 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import { DocumentRepository } from 'src/document/domain/repositories/document.repository';
 import { Document, DocumentStatus } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+@Injectable()
 export class PrismaDocumentRepository implements DocumentRepository {
   constructor(private readonly prismaService: PrismaService) {}
   async findById(documentId: string): Promise<Document | null> {
