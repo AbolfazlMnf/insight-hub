@@ -4,14 +4,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateWorkspaceDto } from './dtos/create-workspace.dto';
+import { CreateWorkspaceDto } from './presentation/dtos/create-workspace.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
+import { AddWorkspaceMemberDto } from './presentation/dtos/add-workspace-member.dto';
 import { WorkspaceRole } from 'src/generated/prisma/enums';
-import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
-import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
-import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
-import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
+import { RemoveWorkSpaceMemberDto } from './presentation/dtos/remove-member.dto';
+import { ChangeWorkspaceMemberRoleDto } from './presentation/dtos/change-member-role.dto';
+import { UpdateWorkspaceDto } from './presentation/dtos/update-workspace.dto';
+import { WorkspaceQueryDto } from './presentation/dtos/workspace-query.dto';
 import { getPagination, getPaginationMeta } from 'src/shared/utils/pagintaion';
 
 @Injectable()
