@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   DOCUMENT_REPOSITORY,
   DOCUMENT_TEXT_EXTRACTOR,
@@ -16,13 +21,15 @@ export class ProcessDocumentUseCase {
     private readonly documentTextExtractor: DocumentTextExtractor,
   ) {}
   async execute(documentId: string) {
+    console.log(`start processing`);
+
     const document = await this.documentRepository.findById(documentId);
     if (!document) {
-      throw new Error('Document not found');
+      throw new NotFoundException('Document not found');
     }
 
     if (document.mimeType !== 'application/pdf') {
-      throw new Error('Unsupported document type');
+      throw new BadRequestException('Unsupported document type');
     }
     await this.documentRepository.updateStatus(
       documentId,

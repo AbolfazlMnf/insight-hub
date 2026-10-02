@@ -1,4 +1,5 @@
 import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { DocumentProcessingQueue } from 'src/document/application/ports/document-processing-queue.port';
 import { IProcessDocumentJobData } from 'src/document/application/types/document-job.type';
@@ -7,6 +8,7 @@ import {
   PROCESS_DOCUMENT_JOB,
 } from 'src/document/constants/document-queue.constant';
 
+@Injectable()
 export class BullDocumentProcessingQueue implements DocumentProcessingQueue {
   constructor(
     @InjectQueue(DOCUMENT_PROCESSING_QUEUE)
