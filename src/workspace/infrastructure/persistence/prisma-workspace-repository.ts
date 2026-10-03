@@ -13,7 +13,7 @@ export class PrismaWorkspaceRepository implements WorkspaceRepository {
   async createWithOwner(
     data: { name: string; slug: string },
     ownerId: string,
-  ): Promise<Workspace | null> {
+  ): Promise<Workspace> {
     return this.prismaService.$transaction(async (tx) => {
       const workspace = await tx.workspace.create({
         data: {

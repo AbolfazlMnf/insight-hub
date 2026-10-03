@@ -4,7 +4,7 @@ export interface WorkspaceRepository {
   createWithOwner(
     data: { name: string; slug: string },
     ownerId: string,
-  ): Promise<Workspace | null>;
+  ): Promise<Workspace>;
 
   updateWorkspace(
     workspaceId: string,
