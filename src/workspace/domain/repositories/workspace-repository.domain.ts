@@ -3,6 +3,8 @@ import {
   WorkspaceMember,
   WorkspaceRole,
 } from 'src/generated/prisma/client';
+import { GeneralSortOrder } from 'src/shared/types/general';
+import { WorkspaceSort } from 'src/workspace/presentation/dtos/workspace-query.dto';
 
 export interface WorkspaceRepository {
   createWithOwner(
@@ -33,4 +35,31 @@ export interface WorkspaceRepository {
     userId: string;
     role: WorkspaceRole;
   }): Promise<WorkspaceMember>;
+
+  findUserWorkspaces(input: {
+    userId: string;
+    page: number;
+    limit: number;
+    sortBy?: WorkspaceSort;
+    sortOrder?: GeneralSortOrder;
+    search?: string;
+    role?: WorkspaceRole;
+  }): Promise<{
+    data: Array<WorkspaceMember & { workspace: Workspace }>;
+    totalCount: number;
+  }>;
+
+  findWorkspaceMembers(workspaceId: string): Promise<
+    Array<{
+      role: WorkspaceRole;
+      createdAt: Date;
+      updatedAt: Date;
+      user: {
+        id: string;
+        name: string | null;
+        username: string;
+        email: string;
+      };
+    }>
+  >;
 }

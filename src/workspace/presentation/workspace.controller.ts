@@ -31,6 +31,8 @@ import { ChangeWorkspaceMemberRoleUseCase } from '../application/use-cases/chang
 import { UpdateWorkspaceUseCase } from '../application/use-cases/update-workspace.use-case';
 import { DeleteWorkspaceUseCase } from '../application/use-cases/delete-workspace.use-case';
 import { FindWorkspaceUseCase } from '../application/use-cases/find-workspace.use-case';
+import { FindUserWorkspacesUseCase } from '../application/use-cases/find-user-workspaces.use-case';
+import { FindWorkspaceMembersUseCase } from '../application/use-cases/find-workspace-members.use-case';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
@@ -38,7 +40,6 @@ import { FindWorkspaceUseCase } from '../application/use-cases/find-workspace.us
 @Controller('workspace')
 export class WorkspaceController {
   constructor(
-    private readonly workspaceService: WorkspaceService,
     private readonly createWorkspaceUseCase: CreateWorkspaceUseCase,
     private readonly addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
     private readonly deleteWorkspaceMemberUseCase: DeleteWorkspaceMemberUseCase,
@@ -46,6 +47,8 @@ export class WorkspaceController {
     private readonly updateWorkspaceUseCase: UpdateWorkspaceUseCase,
     private readonly deleteWorkspaceUseCase: DeleteWorkspaceUseCase,
     private readonly findWorkspaceUseCase: FindWorkspaceUseCase,
+    private readonly findUserWorkspacesUseCase: FindUserWorkspacesUseCase,
+    private readonly findWorkspaceMembersUseCase: FindWorkspaceMembersUseCase,
   ) {}
 
   @Post('create')
@@ -68,7 +71,15 @@ export class WorkspaceController {
       'Returns all workspaces that the authenticated user is a member of.',
   })
   getUserWorkspaces(@User() userId: string, @Query() query: WorkspaceQueryDto) {
-    return this.workspaceService.getUserWorkspaces(userId, query);
+    return this.findUserWorkspacesUseCase.execute({
+      userId,
+      page: query.page,
+      limit: query.limit,
+      search: query.search,
+      sortBy: query.sortBy,
+      sortOrder: query.sortOrder,
+      role: query.role,
+    });
   }
 
   @Get(':id')
@@ -125,10 +136,10 @@ export class WorkspaceController {
     @User() currentUserId: string,
     @Param('id') workspaceId: string,
   ) {
-    return this.workspaceService.getWorkspaceMembers(
-      currentUserId,
+    return this.findWorkspaceMembersUseCase.execute({
       workspaceId,
-    );
+      userId: currentUserId,
+    });
   }
 
   @Delete(':id/members')

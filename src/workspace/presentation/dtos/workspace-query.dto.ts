@@ -4,7 +4,7 @@ import { WorkspaceRole } from 'src/generated/prisma/enums';
 import { PaginationQueryDto } from 'src/shared/dtos/pagination-query.dto';
 import { GeneralSortOrder } from 'src/shared/types/general';
 
-enum WorkspaceSort {
+export enum WorkspaceSort {
   CreatedAt = `createdAt`,
   Name = `name`,
 }

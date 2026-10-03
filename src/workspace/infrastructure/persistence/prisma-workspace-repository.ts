@@ -5,7 +5,9 @@ import {
   WorkspaceRole,
 } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { GeneralSortOrder } from 'src/shared/types/general';
 import { WorkspaceRepository } from 'src/workspace/domain/repositories/workspace-repository.domain';
+import { WorkspaceSort } from 'src/workspace/presentation/dtos/workspace-query.dto';
 
 @Injectable()
 export class PrismaWorkspaceRepository implements WorkspaceRepository {
@@ -115,6 +117,96 @@ export class PrismaWorkspaceRepository implements WorkspaceRepository {
       },
       data: {
         role: data.role,
+      },
+    });
+  }
+  async findUserWorkspaces(input: {
+    userId: string;
+    page: number;
+    limit: number;
+    sortBy?: WorkspaceSort;
+    sortOrder?: GeneralSortOrder;
+    search?: string;
+    role?: WorkspaceRole;
+  }): Promise<{
+    data: Array<WorkspaceMember & { workspace: Workspace }>;
+    totalCount: number;
+  }> {
+    const {
+      sortBy = WorkspaceSort.CreatedAt,
+      userId,
+      page,
+      limit,
+      search,
+      sortOrder = GeneralSortOrder.DESC,
+      role,
+    } = input;
+
+    const [data, count] = await Promise.all([
+      this.prismaService.workspaceMember.findMany({
+        where: {
+          userId: userId,
+          role,
+          workspace: {
+            name: {
+              contains: search,
+              mode: `insensitive`,
+            },
+          },
+        },
+        include: {
+          workspace: true,
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: {
+          workspace: {
+            [sortBy]: sortOrder,
+          },
+        },
+      }),
+      this.prismaService.workspaceMember.count({
+        where: {
+          userId: userId,
+          role,
+          workspace: {
+            name: {
+              contains: search,
+              mode: `insensitive`,
+            },
+          },
+        },
+      }),
+    ]);
+    return { data, totalCount: count };
+  }
+  findWorkspaceMembers(workspaceId: string): Promise<
+    Array<{
+      role: WorkspaceRole;
+      createdAt: Date;
+      updatedAt: Date;
+      user: {
+        id: string;
+        name: string | null;
+        username: string;
+        email: string;
+      };
+    }>
+  > {
+    return this.prismaService.workspaceMember.findMany({
+      where: { workspaceId },
+      select: {
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            email: true,
+          },
+        },
       },
     });
   }

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { WorkspaceService } from './workspace.service';
 import { WorkspaceController } from './presentation/workspace.controller';
 import { PrismaWorkspaceRepository } from './infrastructure/persistence/prisma-workspace-repository';
 import { WORKSPACE_REPOSITORY } from './constants/workspace.token';
@@ -11,11 +10,12 @@ import { ChangeWorkspaceMemberRoleUseCase } from './application/use-cases/change
 import { UpdateWorkspaceUseCase } from './application/use-cases/update-workspace.use-case';
 import { DeleteWorkspaceUseCase } from './application/use-cases/delete-workspace.use-case';
 import { FindWorkspaceUseCase } from './application/use-cases/find-workspace.use-case';
+import { FindUserWorkspacesUseCase } from './application/use-cases/find-user-workspaces.use-case';
+import { FindWorkspaceMembersUseCase } from './application/use-cases/find-workspace-members.use-case';
 
 @Module({
   controllers: [WorkspaceController],
   providers: [
-    WorkspaceService,
     PrismaWorkspaceRepository,
     {
       provide: WORKSPACE_REPOSITORY,
@@ -29,7 +29,9 @@ import { FindWorkspaceUseCase } from './application/use-cases/find-workspace.use
     UpdateWorkspaceUseCase,
     DeleteWorkspaceUseCase,
     FindWorkspaceUseCase,
+    FindUserWorkspacesUseCase,
+    FindWorkspaceMembersUseCase,
   ],
-  exports: [WorkspaceService],
+  exports: [],
 })
 export class WorkspaceModule {}
