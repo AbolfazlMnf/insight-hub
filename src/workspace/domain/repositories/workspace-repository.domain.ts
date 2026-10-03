@@ -1,11 +1,18 @@
-import { Workspace } from 'src/generated/prisma/client';
+import { Workspace, WorkspaceMember } from 'src/generated/prisma/client';
 
 export interface WorkspaceRepository {
-  create(data: { name: string; slug: string }): Promise<Workspace | null>;
+  createWithOwner(
+    data: { name: string; slug: string },
+    ownerId: string,
+  ): Promise<Workspace | null>;
 
-  update(
+  updateWorkspace(
     workspaceId: string,
     data: { name?: string; slug?: string },
   ): Promise<Workspace>;
-  delete(workspaceId: string): Promise<void>;
+  deleteWorkspace(workspaceId: string): Promise<void>;
+  findMember(
+    userId: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMember | null>;
 }

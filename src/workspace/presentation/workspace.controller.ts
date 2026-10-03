@@ -27,13 +27,17 @@ import { WorkspaceService } from './workspace.service';
 import { User } from 'src/shared/decorators/user.decorator';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
+import { CreateWorkspaceUseCase } from '../application/use-cases/create-workspace.use-case';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
 @UseGuards(JwtGuard)
 @Controller('workspace')
 export class WorkspaceController {
-  constructor(private readonly workspaceService: WorkspaceService) {}
+  constructor(
+    private readonly workspaceService: WorkspaceService,
+    private readonly createWorkspaceUseCase: CreateWorkspaceUseCase,
+  ) {}
 
   @Post('create')
   @ApiOperation({
@@ -42,7 +46,10 @@ export class WorkspaceController {
       'Creates a workspace and assigns the authenticated user as its owner.',
   })
   createWorkspace(@Body() body: CreateWorkspaceDto, @User() userId: string) {
-    return this.workspaceService.createWorkspace(body, userId);
+    return this.createWorkspaceUseCase.execute(
+      { name: body.name, slug: body.slug },
+      userId,
+    );
   }
 
   @Get()
