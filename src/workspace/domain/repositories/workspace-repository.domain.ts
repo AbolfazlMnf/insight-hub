@@ -9,7 +9,10 @@ export interface WorkspaceRepository {
     data: { name: string; slug: string },
     ownerId: string,
   ): Promise<Workspace>;
-
+  findWorkspace(
+    workspaceId: string,
+    userId: string,
+  ): Promise<(WorkspaceMember & { workspace: Workspace }) | null>;
   updateWorkspace(
     workspaceId: string,
     data: { name?: string; slug?: string },

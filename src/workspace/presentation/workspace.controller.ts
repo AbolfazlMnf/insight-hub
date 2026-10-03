@@ -22,9 +22,6 @@ import { AddWorkspaceMemberDto } from './dtos/add-workspace-member.dto';
 import { RemoveWorkSpaceMemberDto } from './dtos/remove-member.dto';
 import { ChangeWorkspaceMemberRoleDto } from './dtos/change-member-role.dto';
 import { UpdateWorkspaceDto } from './dtos/update-workspace.dto';
-
-import { WorkspaceService } from './workspace.service';
-
 import { User } from 'src/shared/decorators/user.decorator';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
@@ -33,6 +30,7 @@ import { DeleteWorkspaceMemberUseCase } from '../application/use-cases/delete-wo
 import { ChangeWorkspaceMemberRoleUseCase } from '../application/use-cases/change-workspace-member-role.use-case';
 import { UpdateWorkspaceUseCase } from '../application/use-cases/update-workspace.use-case';
 import { DeleteWorkspaceUseCase } from '../application/use-cases/delete-workspace.use-case';
+import { FindWorkspaceUseCase } from '../application/use-cases/find-workspace.use-case';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
@@ -47,6 +45,7 @@ export class WorkspaceController {
     private readonly changeWorkspaceMemberRoleUseCase: ChangeWorkspaceMemberRoleUseCase,
     private readonly updateWorkspaceUseCase: UpdateWorkspaceUseCase,
     private readonly deleteWorkspaceUseCase: DeleteWorkspaceUseCase,
+    private readonly findWorkspaceUseCase: FindWorkspaceUseCase,
   ) {}
 
   @Post('create')
@@ -83,7 +82,10 @@ export class WorkspaceController {
     description: 'Workspace ID',
   })
   getWorkSpace(@Param('id') id: string, @User() userId: string) {
-    return this.workspaceService.getWorkSpace(id, userId);
+    return this.findWorkspaceUseCase.execute({
+      workspaceId: id,
+      currentUserId: userId,
+    });
   }
 
   @Post(':id/members')

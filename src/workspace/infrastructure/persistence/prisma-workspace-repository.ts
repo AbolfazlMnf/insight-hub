@@ -31,6 +31,21 @@ export class PrismaWorkspaceRepository implements WorkspaceRepository {
       return workspace;
     });
   }
+
+  async findWorkspace(
+    workspaceId: string,
+    userId: string,
+  ): Promise<(WorkspaceMember & { workspace: Workspace }) | null> {
+    return this.prismaService.workspaceMember.findUnique({
+      where: {
+        userId_workspaceId: { userId, workspaceId },
+      },
+      include: {
+        workspace: true,
+      },
+    });
+  }
+
   async updateWorkspace(
     workspaceId: string,
     data: { name?: string; slug?: string },
