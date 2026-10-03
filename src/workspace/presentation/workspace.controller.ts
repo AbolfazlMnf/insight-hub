@@ -1,3 +1,4 @@
+import { AddWorkspaceMemberUseCase } from './../application/use-cases/add-workspace-member.use-case';
 import {
   Body,
   Controller,
@@ -37,6 +38,7 @@ export class WorkspaceController {
   constructor(
     private readonly workspaceService: WorkspaceService,
     private readonly createWorkspaceUseCase: CreateWorkspaceUseCase,
+    private readonly addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
   ) {}
 
   @Post('create')

@@ -63,4 +63,20 @@ export class PrismaWorkspaceRepository implements WorkspaceRepository {
       },
     });
   }
+  async addMember(data: {
+    workspaceId: string;
+    userId: string;
+    role: WorkspaceRole;
+  }): Promise<WorkspaceMember & { workspace: Workspace }> {
+    return this.prismaService.workspaceMember.create({
+      data: {
+        workspaceId: data.workspaceId,
+        userId: data.userId,
+        role: data.role,
+      },
+      include: {
+        workspace: true,
+      },
+    });
+  }
 }

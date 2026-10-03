@@ -1,4 +1,8 @@
-import { Workspace, WorkspaceMember } from 'src/generated/prisma/client';
+import {
+  Workspace,
+  WorkspaceMember,
+  WorkspaceRole,
+} from 'src/generated/prisma/client';
 
 export interface WorkspaceRepository {
   createWithOwner(
@@ -15,4 +19,9 @@ export interface WorkspaceRepository {
     userId: string,
     workspaceId: string,
   ): Promise<WorkspaceMember | null>;
+  addMember(data: {
+    workspaceId: string;
+    userId: string;
+    role: WorkspaceRole;
+  }): Promise<WorkspaceMember & { workspace: Workspace }>;
 }
