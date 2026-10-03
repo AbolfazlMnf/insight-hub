@@ -4,6 +4,7 @@ import { WorkspaceController } from './presentation/workspace.controller';
 import { PrismaWorkspaceRepository } from './infrastructure/persistence/prisma-workspace-repository';
 import { WORKSPACE_REPOSITORY } from './constants/workspace.token';
 import { CreateWorkspaceUseCase } from './application/use-cases/create-workspace.use-case';
+import { WorkspaceMemberAccessService } from './application/services/workspace-member-access.service';
 
 @Module({
   controllers: [WorkspaceController],
@@ -15,6 +16,7 @@ import { CreateWorkspaceUseCase } from './application/use-cases/create-workspace
       useExisting: PrismaWorkspaceRepository,
     },
     CreateWorkspaceUseCase,
+    WorkspaceMemberAccessService,
   ],
   exports: [WorkspaceService],
 })
