@@ -86,4 +86,21 @@ export class PrismaWorkspaceRepository implements WorkspaceRepository {
       },
     });
   }
+  async changeMemberRole(data: {
+    workspaceId: string;
+    userId: string;
+    role: WorkspaceRole;
+  }): Promise<WorkspaceMember> {
+    return this.prismaService.workspaceMember.update({
+      where: {
+        userId_workspaceId: {
+          userId: data.userId,
+          workspaceId: data.workspaceId,
+        },
+      },
+      data: {
+        role: data.role,
+      },
+    });
+  }
 }

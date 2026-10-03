@@ -30,6 +30,8 @@ import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
 import { CreateWorkspaceUseCase } from '../application/use-cases/create-workspace.use-case';
 import { DeleteWorkspaceMemberUseCase } from '../application/use-cases/delete-workspace-member.use-case';
+import { ChangeWorkspaceMemberRoleUseCase } from '../application/use-cases/change-workspace-member-role.use-case';
+import { UpdateWorkspaceUseCase } from '../application/use-cases/update-workspace.use-case';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
@@ -41,6 +43,8 @@ export class WorkspaceController {
     private readonly createWorkspaceUseCase: CreateWorkspaceUseCase,
     private readonly addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
     private readonly deleteWorkspaceMemberUseCase: DeleteWorkspaceMemberUseCase,
+    private readonly changeWorkspaceMemberRoleUseCase: ChangeWorkspaceMemberRoleUseCase,
+    private readonly updateWorkspaceUseCase: UpdateWorkspaceUseCase,
   ) {}
 
   @Post('create')
@@ -139,8 +143,8 @@ export class WorkspaceController {
     @Body() body: RemoveWorkSpaceMemberDto,
   ) {
     return this.deleteWorkspaceMemberUseCase.execute({
-      currentMemberId: currentUserId,
-      targetMemberId: body.targetUserId,
+      currentUserId: currentUserId,
+      targetUserId: body.targetUserId,
       workspaceId,
     });
   }
@@ -160,11 +164,12 @@ export class WorkspaceController {
     @Body() body: ChangeWorkspaceMemberRoleDto,
     @User() currentUserId: string,
   ) {
-    return this.workspaceService.changeWorkspaceMemberRole(
-      body,
+    return this.changeWorkspaceMemberRoleUseCase.execute({
       currentUserId,
+      targetUserId: body.targetUserId,
+      role: body.role,
       workspaceId,
-    );
+    });
   }
 
   @Patch(':id')
@@ -182,10 +187,9 @@ export class WorkspaceController {
     @Param('id') workspaceId: string,
     @User() currentUserId: string,
   ) {
-    return this.workspaceService.updateWorkspace(
-      body,
+    return this.updateWorkspaceUseCase.execute(
+      { workspaceId, slug: body.slug, name: body.name },
       currentUserId,
-      workspaceId,
     );
   }
 

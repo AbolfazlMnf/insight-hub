@@ -7,6 +7,8 @@ import { CreateWorkspaceUseCase } from './application/use-cases/create-workspace
 import { WorkspaceMemberAccessService } from './application/services/workspace-member-access.service';
 import { AddWorkspaceMemberUseCase } from './application/use-cases/add-workspace-member.use-case';
 import { DeleteWorkspaceMemberUseCase } from './application/use-cases/delete-workspace-member.use-case';
+import { ChangeWorkspaceMemberRoleUseCase } from './application/use-cases/change-workspace-member-role.use-case';
+import { UpdateWorkspaceUseCase } from './application/use-cases/update-workspace.use-case';
 
 @Module({
   controllers: [WorkspaceController],
@@ -21,6 +23,8 @@ import { DeleteWorkspaceMemberUseCase } from './application/use-cases/delete-wor
     WorkspaceMemberAccessService,
     AddWorkspaceMemberUseCase,
     DeleteWorkspaceMemberUseCase,
+    ChangeWorkspaceMemberRoleUseCase,
+    UpdateWorkspaceUseCase,
   ],
   exports: [WorkspaceService],
 })
