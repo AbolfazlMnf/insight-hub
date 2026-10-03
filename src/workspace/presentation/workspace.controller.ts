@@ -29,6 +29,7 @@ import { User } from 'src/shared/decorators/user.decorator';
 import { JwtGuard } from 'src/shared/guards/jwt.guard';
 import { WorkspaceQueryDto } from './dtos/workspace-query.dto';
 import { CreateWorkspaceUseCase } from '../application/use-cases/create-workspace.use-case';
+import { DeleteWorkspaceMemberUseCase } from '../application/use-cases/delete-workspace-member.use-case';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
@@ -39,6 +40,7 @@ export class WorkspaceController {
     private readonly workspaceService: WorkspaceService,
     private readonly createWorkspaceUseCase: CreateWorkspaceUseCase,
     private readonly addWorkspaceMemberUseCase: AddWorkspaceMemberUseCase,
+    private readonly deleteWorkspaceMemberUseCase: DeleteWorkspaceMemberUseCase,
   ) {}
 
   @Post('create')
@@ -93,11 +95,12 @@ export class WorkspaceController {
     @User() currentUserId: string,
     @Param('id') workspaceId: string,
   ) {
-    return this.workspaceService.addWorkspaceMember(
-      body,
-      currentUserId,
+    return this.addWorkspaceMemberUseCase.execute({
+      currentUserId: currentUserId,
+      targetUserId: body.targetUserId,
       workspaceId,
-    );
+      role: body.role,
+    });
   }
 
   @Get(':id/members')
@@ -135,11 +138,11 @@ export class WorkspaceController {
     @User() currentUserId: string,
     @Body() body: RemoveWorkSpaceMemberDto,
   ) {
-    return this.workspaceService.removeWorkspaceMember(
-      currentUserId,
-      body,
+    return this.deleteWorkspaceMemberUseCase.execute({
+      currentMemberId: currentUserId,
+      targetMemberId: body.targetUserId,
       workspaceId,
-    );
+    });
   }
 
   @Patch(':id/members/role')

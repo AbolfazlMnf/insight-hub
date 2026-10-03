@@ -24,4 +24,5 @@ export interface WorkspaceRepository {
     userId: string;
     role: WorkspaceRole;
   }): Promise<WorkspaceMember & { workspace: Workspace }>;
+  deleteMember(userId: string, workspaceId: string): Promise<void>;
 }

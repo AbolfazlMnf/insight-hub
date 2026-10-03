@@ -79,4 +79,11 @@ export class PrismaWorkspaceRepository implements WorkspaceRepository {
       },
     });
   }
+  async deleteMember(userId: string, workspaceId: string): Promise<void> {
+    await this.prismaService.workspaceMember.delete({
+      where: {
+        userId_workspaceId: { userId, workspaceId },
+      },
+    });
+  }
 }
