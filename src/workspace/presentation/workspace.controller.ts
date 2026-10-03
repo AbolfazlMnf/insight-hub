@@ -32,6 +32,7 @@ import { CreateWorkspaceUseCase } from '../application/use-cases/create-workspac
 import { DeleteWorkspaceMemberUseCase } from '../application/use-cases/delete-workspace-member.use-case';
 import { ChangeWorkspaceMemberRoleUseCase } from '../application/use-cases/change-workspace-member-role.use-case';
 import { UpdateWorkspaceUseCase } from '../application/use-cases/update-workspace.use-case';
+import { DeleteWorkspaceUseCase } from '../application/use-cases/delete-workspace.use-case';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
@@ -45,6 +46,7 @@ export class WorkspaceController {
     private readonly deleteWorkspaceMemberUseCase: DeleteWorkspaceMemberUseCase,
     private readonly changeWorkspaceMemberRoleUseCase: ChangeWorkspaceMemberRoleUseCase,
     private readonly updateWorkspaceUseCase: UpdateWorkspaceUseCase,
+    private readonly deleteWorkspaceUseCase: DeleteWorkspaceUseCase,
   ) {}
 
   @Post('create')
@@ -207,6 +209,6 @@ export class WorkspaceController {
     @Param('id') workspaceId: string,
     @User() currentUserId: string,
   ) {
-    return this.workspaceService.deleteWorkspace(currentUserId, workspaceId);
+    return this.deleteWorkspaceUseCase.execute({ currentUserId, workspaceId });
   }
 }
